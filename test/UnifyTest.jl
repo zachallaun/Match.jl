@@ -71,4 +71,13 @@ using Unify
         unify(or([1, 2], [2, 3]), [lvar(:x), lvar(:x)]) => false
     end
 
+    @fact "asserting type" begin
+        unify(typed(lvar(:x), Int), 1) => {lvar(:x) => 1}
+        unify(typed(lvar(:x), Float64), 1) => false
+
+        unify(1, 1.0) => Dict()
+        unify(typed(1, Int), 1.0) => false
+        unify(1, typed(1.0, Int)) => Dict()
+    end
+
 end

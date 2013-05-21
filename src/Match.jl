@@ -66,6 +66,10 @@ function buildcase(case::Expr)
             args, syms = walk_and_replace(args)
             (:(TypeCase($(esc(cons)), $(Expr(:vcat, args...)))), syms)
         end
+    elseif is(head, :(::))
+        ex, typ = case.args
+        args, syms = buildcase(ex)
+        (:(Unify.Typed($args, $(esc(typ)))), syms)
     elseif is(head, :tuple)
         args, syms = walk_and_replace(case.args)
         (Expr(:tuple, args...), syms)

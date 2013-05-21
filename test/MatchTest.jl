@@ -27,6 +27,37 @@ using Match
         fizzbuzz(4)  => 4
     end
 
+    @fact "matching on type" begin
+        function sillytype(x)
+            @match x begin
+                x::Int     -> Int
+                x::Float64 -> Float64
+                x::Char    -> Char
+                _          -> "no clue"
+            end
+        end
+
+        sillytype(1)   => Int
+        sillytype(1.0) => Float64
+        sillytype('1') => Char
+        sillytype("1") => "no clue"
+
+        function samewithtype(tup)
+            @match tup begin
+                (x, x)::(Float64, Float64) -> :a
+                (x, x)::(Int    , Float64) -> :b
+                (x, x)::(Float64, Int    ) -> :c
+                (x, x)::(Int    , Int    ) -> :d
+            end
+        end
+
+        samewithtype((1.0, 1.0)) => :a
+        samewithtype((1, 1.0))   => :b
+        samewithtype((1.0, 1))   => :c
+        samewithtype((1, 1))     => :d
+        samewithtype((1, 2))     => nothing
+    end
+
     @fact "matchcases, nesting, binding" begin
         type Foo
             a
@@ -82,7 +113,18 @@ using Match
 
         (balance(Black(1, Red(2, Red(3, Leaf(), Leaf()), Leaf()), Leaf()))
          => Red(2, Black(3, Leaf(), Leaf()), Black(1, Leaf(), Leaf())))
-
     end
+
+    # @fact "@matching functions" begin
+    #     @matching function map(f::Function, l::List)
+    #         (f, _::EmptyList) -> EmptyList()
+    #         (f, x..rest)      -> f(x)..map(f, rest)
+    #     end
+
+    #     @matching function secd(s, e, c, d)
+    #         (s, e, _::LDC..x..c, d) -> (x..s, e, c, d)
+    #         ......
+    #     end
+    # end
 
 end

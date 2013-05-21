@@ -2,7 +2,7 @@ module Unify
 
 using FunctionalCollections
 
-export unify, extended, lvar, Anything, or
+export unify, extended, lvar, Anything, or, typed
 
 const _LogicVarKey = 0x1f75f6e80ac3828f
 
@@ -105,5 +105,27 @@ _unify(v::LogicVar, either::Either, smap) = extended(smap, v, either)
 _unify(e1::Either, e2::Either, smap) = unify_either(e1, e2, smap)
 _unify(either::Either, other, smap)  = unify_either(either, other, smap)
 _unify(other, either::Either, smap)  = unify_either(either, other, smap)
+
+immutable Typed
+    val
+    typ::Type
+end
+typed = Typed
+
+_unify(t1::Typed, t2::Typed, smap) =
+    is(t1.typ, t2.typ) ? _unify(t1.val, t2.val) : false
+
+_unify(either::Either, t::Typed, smap) = unify_either(either, t, smap)
+_unify(t::Typed, either::Either, smap) = unify_either(either, t, smap)
+
+_unify(::Type{Anything}, t::Typed, smap) = _unify(Anything, t.val, smap)
+_unify(t::Typed, ::Type{Anything}, smap) = _unify(Anything, t.val, smap)
+
+_unify(t::Typed, v::LogicVar, smap) = _unify(t.val, v, smap)
+_unify(v::LogicVar, t::Typed, smap) = _unify(t.val, v, smap)
+
+_unify(val, t::Typed, smap) = _unify(t, val, smap)
+_unify(t::Typed, val, smap) =
+    isa(val, t.typ) ? _unify(t.val, val, smap) : false
 
 end # module Unify
