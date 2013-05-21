@@ -14,7 +14,7 @@ function fizzbuzz(range)
             (0,0) => print("fizzbuzz "),
             (0,_) => print("fizz "),
             (_,0) => print("buzz "),
-            _     => print(string(n, ' '))
+             _    => print(string(n, ' '))
         }
     end
 end
@@ -48,10 +48,10 @@ end
 
 function balance(tree::RBTree)
     res = @match tree {
-        Black(z, Red(y, Red(x, a, b), c), d) => (x, y, z, a, b, c, d),
-        Black(z, Red(x, a, Red(y, b, c)), d) => (x, y, z, a, b, c, d),
-        Black(x, a, Red(z, Red(y, b, c), d)) => (x, y, z, a, b, c, d),
-        Black(x, a, Red(y, b, Red(z, c, d))) => (x, y, z, a, b, c, d),
+      ( Black(z, Red(y, Red(x, a, b), c), d)
+      | Black(z, Red(x, a, Red(y, b, c)), d)
+      | Black(x, a, Red(z, Red(y, b, c), d))
+      | Black(x, a, Red(y, b, Red(z, c, d)))) => (x, y, z, a, b, c, d)
     }
 
     is(res, nothing) && return tree

@@ -1,4 +1,4 @@
-include("./unify.jl")
+include("./Unify.jl")
 
 module Match
 
@@ -62,8 +62,14 @@ function buildcase(case::Expr)
     head = case.head
     if is(head, :call)
         cons, args = case.args[1], case.args[2:end]
-        args, syms = walk_and_replace(args)
-        (:(TypeCase($(esc(cons)), $(Expr(:vcat, args...)))), syms)
+        if is(cons, :|)
+            arg1, syms1 = buildcase(args[1])
+            arg2, syms2 = buildcase(args[2])
+            (:(Unify.Either($arg1, $arg2)), [Set(vcat(syms1, syms2)...)...])
+        else
+            args, syms = walk_and_replace(args)
+            (:(TypeCase($(esc(cons)), $(Expr(:vcat, args...)))), syms)
+        end
     elseif is(head, :tuple)
         args, syms = walk_and_replace(case.args)
         (Expr(:tuple, args...), syms)
@@ -88,6 +94,7 @@ function funcify_case(case, body)
         function (e)
             $smap = Unify.unify($case, e)
             if $smap != false
+                $smap
                 $casebody
             else
                 NoMatch
@@ -111,25 +118,3 @@ macro match(ex, cases)
 end
 
 end # module Match
-
-# type Foo
-#     a
-#     b
-#     c
-# end
-# @matchcase Foo
-
-# f = Foo(rand(1:2), rand(1:2), rand(1:10))
-
-# @match f {
-#     Foo(2, 2) => "twos!",
-#     Foo(1, x) => "one and $x",
-#     Foo(x, 1) => "$x and one"
-# }
-
-# @match (n%3, n%5) {
-#     (0, 0) => "fizzbuzz",
-#     (0, _) => "fizz",
-#     (_, 0) => "buzz",
-#     (_, _) => n,
-# }

@@ -2,7 +2,7 @@ module Unify
 
 using FunctionalCollections
 
-export unify, extended, lvar, Anything
+export unify, extended, lvar, Anything, or
 
 const _LogicVarKey = 0x1f75f6e80ac3828f
 
@@ -83,5 +83,27 @@ _unify(::Type{Anything}, ::LogicVar      , smap) = smap
 _unify(::Type{Anything}, _               , smap) = smap
 _unify(::LogicVar,       ::Type{Anything}, smap) = smap
 _unify(_,                ::Type{Anything}, smap) = smap
+
+immutable Either
+    a
+    b
+end
+or = Either
+
+function unify_either(either::Either, other, smap)
+    val = _unify(either.a, other, smap)
+    val != false && return val
+    _unify(either.b, other, smap)
+end
+
+_unify(::Either, ::Type{Anything}, smap) = smap
+_unify(::Type{Anything}, ::Either, smap) = smap
+
+_unify(either::Either, v::LogicVar, smap) = extended(smap, v, either)
+_unify(v::LogicVar, either::Either, smap) = extended(smap, v, either)
+
+_unify(e1::Either, e2::Either, smap) = unify_either(e1, e2, smap)
+_unify(either::Either, other, smap)  = unify_either(either, other, smap)
+_unify(other, either::Either, smap)  = unify_either(either, other, smap)
 
 end # module Unify

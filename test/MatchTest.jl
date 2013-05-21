@@ -38,4 +38,43 @@ using Match
         nestedallsame(Foo(1,1))               => "fail"
     end
 
+    @fact "or" begin
+        abstract RBTree
+
+        immutable Leaf <: RBTree
+        end
+
+        immutable Red <: RBTree
+            value
+            left::RBTree
+            right::RBTree
+        end
+        @matchcase Red
+
+        immutable Black <: RBTree
+            value
+            left::RBTree
+            right::RBTree
+        end
+        @matchcase Black
+
+        function balance(tree::RBTree)
+            res = @match tree {
+              ( Black(z, Red(y, Red(x, a, b), c), d)
+              | Black(z, Red(x, a, Red(y, b, c)), d)
+              | Black(x, a, Red(z, Red(y, b, c), d))
+              | Black(x, a, Red(y, b, Red(z, c, d)))) => (x, y, z, a, b, c, d)
+            }
+
+            is(res, nothing) && return tree
+
+            (x, y, z, a, b, c, d) = res
+            Red(y, Black(x, a, b), Black(z, c, d))
+        end
+
+        (balance(Black(1, Red(2, Red(3, Leaf(), Leaf()), Leaf()), Leaf()))
+         => Red(2, Black(3, Leaf(), Leaf()), Black(1, Leaf(), Leaf())))
+
+    end
+
 end

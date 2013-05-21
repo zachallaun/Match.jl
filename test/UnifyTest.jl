@@ -1,4 +1,4 @@
-include("../src/unify.jl")
+include("../src/Unify.jl")
 
 using FactCheck
 using FunctionalCollections
@@ -62,6 +62,13 @@ using Unify
 
     @fact "Anything unification" begin
         unify(Anything, [1,2]) => Dict()
+    end
+
+    @fact "or" begin
+        unify([lvar(:x), lvar(:x)], or([1, 2], [1, 1])) => {lvar(:x) => 1}
+        unify(or([1, 2], [1, 1]), [lvar(:x), lvar(:x)]) => {lvar(:x) => 1}
+        unify(or([1, 1], [2, 2]), [lvar(:x), lvar(:x)]) => {lvar(:x) => 1}
+        unify(or([1, 2], [2, 3]), [lvar(:x), lvar(:x)]) => false
     end
 
 end
