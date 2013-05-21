@@ -103,8 +103,9 @@ function funcify_case(case, body)
     end
 end
 
-macro match(ex, cases)
-    cases = Expr(:vcat, [funcify_case(case.args...) for case in cases.args[2:]]...)
+macro match(ex, caseblock)
+    cases = filter(ex -> is(ex.head, :->), caseblock.args)
+    cases = Expr(:vcat, [funcify_case(case.args...) for case in cases]...)
     quote
         local cases = $cases
         local e = $(esc(ex))

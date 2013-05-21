@@ -10,12 +10,12 @@ using Match
 
 function fizzbuzz(range)
     for n=range
-        @match (n%3, n%5) {
-            (0,0) => print("fizzbuzz "),
-            (0,_) => print("fizz "),
-            (_,0) => print("buzz "),
-             _    => print(string(n, ' '))
-        }
+        @match (n%3, n%5) begin
+            (0,0) -> print("fizzbuzz ")
+            (0,_) -> print("fizz ")
+            (_,0) -> print("buzz ")
+            (_,_) -> print(string(n, ' '))
+        end
     end
 end
 
@@ -47,12 +47,12 @@ end
 @matchcase Black
 
 function balance(tree::RBTree)
-    res = @match tree {
-      ( Black(z, Red(y, Red(x, a, b), c), d)
-      | Black(z, Red(x, a, Red(y, b, c)), d)
-      | Black(x, a, Red(z, Red(y, b, c), d))
-      | Black(x, a, Red(y, b, Red(z, c, d)))) => (x, y, z, a, b, c, d)
-    }
+    res = @match tree begin
+        ( Black(z, Red(y, Red(x, a, b), c), d)
+        | Black(z, Red(x, a, Red(y, b, c)), d)
+        | Black(x, a, Red(z, Red(y, b, c), d))
+        | Black(x, a, Red(y, b, Red(z, c, d)))) -> (x, y, z, a, b, c, d)
+    end
 
     is(res, nothing) && return tree
 

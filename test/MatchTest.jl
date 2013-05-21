@@ -5,12 +5,12 @@ using Match
 
     @fact "values, wildcards, tuples" begin
         function fizzbuzz(n)
-            @match (n%3, n%5) {
-                (0,0)=>"fizzbuzz",
-                (0,_)=>"fizz",
-                (_,0)=>"buzz",
-                 _   =>n
-            }
+            @match (n%3, n%5) begin
+                (0,0) -> "fizzbuzz"
+                (0,_) -> "fizz"
+                (_,0) -> "buzz"
+                (_,_) -> n
+            end
         end
 
         fizzbuzz(15) => "fizzbuzz"
@@ -27,10 +27,10 @@ using Match
         @matchcase Foo
 
         function nestedallsame(f)
-            @match f {
-                Foo(Foo(x, x), Foo(x, x)) => "match: $x",
-                _ => "fail"
-            }
+            @match f begin
+                Foo(Foo(x, x), Foo(x, x)) -> "match: $x"
+                _ -> "fail"
+            end
         end
 
         nestedallsame(Foo(Foo(1,1),Foo(1,1))) => "match: 1"
@@ -59,12 +59,12 @@ using Match
         @matchcase Black
 
         function balance(tree::RBTree)
-            res = @match tree {
+            res = @match tree begin
               ( Black(z, Red(y, Red(x, a, b), c), d)
               | Black(z, Red(x, a, Red(y, b, c)), d)
               | Black(x, a, Red(z, Red(y, b, c), d))
-              | Black(x, a, Red(y, b, Red(z, c, d)))) => (x, y, z, a, b, c, d)
-            }
+              | Black(x, a, Red(y, b, Red(z, c, d)))) -> (x, y, z, a, b, c, d)
+            end
 
             is(res, nothing) && return tree
 
