@@ -3,6 +3,14 @@ using Match
 
 @facts "Pattern Matching" begin
 
+    @fact "literal values" begin
+        (@match 1 begin
+            3 -> "three"
+            2 -> "two"
+            1 -> "one"
+         end) => "one"
+    end
+
     @fact "values, wildcards, tuples" begin
         function fizzbuzz(n)
             @match (n%3, n%5) begin

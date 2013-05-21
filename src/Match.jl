@@ -44,20 +44,16 @@ function walk_and_replace(v)
     syms = Symbol[]
 
     function f(x)
-        if applicable(buildcase, x)
-            newx, others = buildcase(x)
-            vcat!(syms, others)
-            newx
-        else
-            x
-        end
+        newx, others = buildcase(x)
+        vcat!(syms, others)
+        newx
     end
 
     (map(f, v), [Set(syms...)...])
 end
 
+buildcase(case)         = (case, {})
 buildcase(case::Symbol) = is(case, :_) ? (Anything, {}) : (lvar(case), {case})
-
 function buildcase(case::Expr)
     head = case.head
     if is(head, :call)
@@ -94,7 +90,6 @@ function funcify_case(case, body)
         function (e)
             $smap = Unify.unify($case, e)
             if $smap != false
-                $smap
                 $casebody
             else
                 NoMatch
