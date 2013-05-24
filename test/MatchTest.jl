@@ -77,7 +77,7 @@ using Match
         nestedallsame(Foo(1,1))               => "fail"
     end
 
-    @fact "or" begin
+    @fact "or, @matching" begin
         abstract RBTree
 
         immutable Leaf <: RBTree
@@ -98,33 +98,30 @@ using Match
         @matchcase Black
 
         function balance(tree::RBTree)
-            res = @match tree begin
-              ( Black(z, Red(y, Red(x, a, b), c), d)
-              | Black(z, Red(x, a, Red(y, b, c)), d)
-              | Black(x, a, Red(z, Red(y, b, c), d))
-              | Black(x, a, Red(y, b, Red(z, c, d)))) -> (x, y, z, a, b, c, d)
+            @match tree begin
+                ( Black(z, Red(y, Red(x, a, b), c), d)
+                | Black(z, Red(x, a, Red(y, b, c)), d)
+                | Black(x, a, Red(z, Red(y, b, c), d))
+                | Black(x, a, Red(y, b, Red(z, c, d)))) -> Red(y, Black(x, a, b),
+                                                                  Black(z, c, d))
+                tree -> tree
             end
-
-            is(res, nothing) && return tree
-
-            (x, y, z, a, b, c, d) = res
-            Red(y, Black(x, a, b), Black(z, c, d))
         end
 
         (balance(Black(1, Red(2, Red(3, Leaf(), Leaf()), Leaf()), Leaf()))
          => Red(2, Black(3, Leaf(), Leaf()), Black(1, Leaf(), Leaf())))
+
+        @matching function balance2(tree::RBTree)
+            ( Black(z, Red(y, Red(x, a, b), c), d)
+            | Black(z, Red(x, a, Red(y, b, c)), d)
+            | Black(x, a, Red(z, Red(y, b, c), d))
+            | Black(x, a, Red(y, b, Red(z, c, d)))) -> Red(y, Black(x, a, b),
+                                                              Black(z, c, d))
+            tree -> tree
+        end
+
+        (balance2(Black(1, Leaf(), Red(2, Leaf(), Red(3, Leaf(), Leaf()))))
+         => Red(2, Black(1, Leaf(), Leaf()), Black(3, Leaf(), Leaf())))
     end
-
-    # @fact "@matching functions" begin
-    #     @matching function map(f::Function, l::List)
-    #         (f, _::EmptyList) -> EmptyList()
-    #         (f, x..rest)      -> f(x)..map(f, rest)
-    #     end
-
-    #     @matching function secd(s, e, c, d)
-    #         (s, e, _::LDC..x..c, d) -> (x..s, e, c, d)
-    #         ......
-    #     end
-    # end
 
 end

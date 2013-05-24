@@ -5,7 +5,7 @@ module Match
 using Unify
 using ExpressionUtils
 
-export @match, @matchcase
+export @match, @matching, @matchcase
 
 function vcat!(v1::Vector, v2::Vector)
     for el in v2 push!(v1, el) end
@@ -102,7 +102,7 @@ function funcify_case(case, body)
     end
 end
 
-macro match(ex, caseblock)
+function match(ex, caseblock::Expr)
     cases = filter(ex -> is(ex.head, :->), caseblock.args)
     cases = Expr(:vcat, [funcify_case(case.args...) for case in cases]...)
     quote
@@ -115,6 +115,26 @@ macro match(ex, caseblock)
         end
         is(val, NoMatch) ? nothing : val
     end
+end
+
+macro match(args...)
+    match(args...)
+end
+
+macro matching(fn::Expr)
+    assert(is(fn.head, :function), "@matching must be given a :function")
+
+    matchbody = fn.args[2]
+    fnparams = fn.args[1].args[2:]
+
+    fn.args[1] = map(esc, fn.args[1])
+
+    assert(length(fnparams) > 0, "@matching functions must take at least one parameter")
+
+    matchval = length(fnparams) == 1 ? fnparams[1] : Expr(:tuple, fnparams...)
+
+    fn.args[2] = match(matchval, matchbody)
+    fn
 end
 
 end # module Match

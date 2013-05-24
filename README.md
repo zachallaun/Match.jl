@@ -46,18 +46,13 @@ immutable Black <: RBTree
 end
 @matchcase Black
 
-function balance(tree::RBTree)
-    res = @match tree begin
-        ( Black(z, Red(y, Red(x, a, b), c), d)
-        | Black(z, Red(x, a, Red(y, b, c)), d)
-        | Black(x, a, Red(z, Red(y, b, c), d))
-        | Black(x, a, Red(y, b, Red(z, c, d)))) -> (x, y, z, a, b, c, d)
-    end
-
-    is(res, nothing) && return tree
-
-    (x, y, z, a, b, c, d) = res
-    Red(y, Black(x, a, b), Black(z, c, d))
+@matching function balance(tree::RBTree)
+    ( Black(z, Red(y, Red(x, a, b), c), d)
+    | Black(z, Red(x, a, Red(y, b, c)), d)
+    | Black(x, a, Red(z, Red(y, b, c), d))
+    | Black(x, a, Red(y, b, Red(z, c, d)))) -> Red(y, Black(x, a, b),
+                                                      Black(z, c, d))
+    tree -> tree
 end
 
 balance(Black(1, Red(2, Red(3, Leaf(), Leaf()), Leaf()), Leaf()))
