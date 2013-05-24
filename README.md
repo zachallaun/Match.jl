@@ -3,8 +3,17 @@
 Pattern matching as an exercise. This really shouldn't be used right
 now. Probably slow as hell.
 
+## Use
 
-## Awesome Fizzbuzz
+Three macros are exposed: `@match`, `@matching`, and `@matchcase`.
+`@match` is the primary pattern-matching switch statement. `@matching`
+is a helper for creating functions the body of which are solely `@match`
+expressions. `@matchcase` is a helper for autogenerating the boilerplate
+necessary to pattern match using constructor-like syntax.
+
+The examples serve as a syntax reference.
+
+### Awesome Fizzbuzz
 ```jl
 using Match
 
@@ -23,7 +32,7 @@ fizzbuzz(1:15)
 # => prints "1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 fizz 13 14 fizzbuzz"
 ```
 
-## Balancing red-black trees
+### Balancing red-black trees
 ```jl
 using Match
 
