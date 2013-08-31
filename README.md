@@ -1,7 +1,8 @@
 # Match.jl
 
 Pattern matching as an exercise. This really shouldn't be used right
-now. Probably slow as hell.
+now. Probably slow as hell. Instead, you should check out the similarly
+named [Match.jl](https://github.com/kmsquire/Match.jl)!
 
 ## Use
 
